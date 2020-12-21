@@ -1,31 +1,46 @@
 clear
 set verbose off
-set workdir "/home/at/git/gretl_pandas_pypolars" # adjust path accordingly!
 
-# Load csv file
+# adjust path accordingly!
+string PATH = "/home/at/git/gretl_pandas_pypolars"
+
+set workdir "@PATH"
+
+
+# Load csv file as it is shipped
 set stopwatch
 open "./data/users.csv" --quiet
-printf "Loading csv data file took Gretl %.2f seconds.\n", $stopwatch
-flush
+scalar time_csv = $stopwatch
 
-/* THAT TAKES WAY TOO LONG
-# Store data set as gretl binary
+# Load csv file but column 'author' is renamed to `obs`
+nulldata 1 --preserve              # clear current data set to save memory
 set stopwatch
-store "./data/users.gdtb"
-printf "Storing data as gdtb file took Gretl %.2f seconds.\n", $stopwatch
-flush
-# Load gdtb file
-set stopwatch
-open "./data/users.gdtb" --quiet
-printf "Loading gdtb data file took Gretl %.2f seconds.\n", $stopwatch
-flush
-quit
-*/
+open "./data/users_obs.csv" --quiet --preserve
+scalar time_csv_obs = $stopwatch
 
 # Sort data
+set stopwatch
 dataset sortby n
-printf "Sorting csv data file took Gretl %.2f seconds.\n", $stopwatch
-flush
+scalar time_sort = $stopwatch
+
+# Write gbin
+set stopwatch
+store "./data/users.gbin" --preserve
+scalar time_write_gbin = $stopwatch
+
+# Load gbin
+nulldata 1 --preserve
+set stopwatch
+open "./data/users.gbin" --quiet --preserve
+scalar time_load_gbin = $stopwatch
+
+
+# Summarize
+printf "Loading csv data file took Gretl %.4f seconds.\n", time_csv
+printf "Loading csv data file with column 'obs' took Gretl %.4f seconds.\n", time_csv_obs
+printf "Sorting csv data file took Gretl %.4f seconds.\n", time_sort
+printf "Write gbin data file took Gretl %.4f seconds.\n", time_write_gbin
+printf "Load gbin data file took Gretl %.4f seconds.\n", time_load_gbin
 
 quit            # comment out if you want to run the following Python code
 
@@ -88,7 +103,6 @@ stop = timeit.default_timer()
 
 print('Sorting the data frame took pypolars: ', stop - start)
 end foreign
-
 
 
 quit
