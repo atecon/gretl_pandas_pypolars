@@ -3,13 +3,13 @@ After reading [this article on kdnuggets](https://www.kdnuggets.com/2020/12/risi
 
 Take into account that this 'project' only focuses on two aspects:
 
-1) Reading performance for large csv files. \
+1) Reading performance for large csv files.
 2) Performance of sorting the data set by the number of comments.
 
 
 # Main results
-1) Py-polars takes about 2.5 seconds to load a 360 MB large csv file as a data frame. Pandas is about 5 times slower while Gretl needs 36 seconds for this.\
-3) However, making use of clever indexing, Gretl needs only about 12 seconds to load the csv file.
+1) Py-polars takes about 2.5 seconds to load a 360 MB large csv file as a data frame. Pandas is about 5 times slower while Gretl needs 36 seconds for this.
+2) However, making use of clever indexing, Gretl needs only about 12 seconds to load the csv file.
 3) Sorting 26 million records takes py-polars about 4.6 seconds and hence is just slightly faster than Pandas with 5.8 sec. -- ok, still 20% percent. Latest experimental Gretl version 2020f needs about 7.8 seconds for the same task.
 
 
