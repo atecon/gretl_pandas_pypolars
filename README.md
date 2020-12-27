@@ -6,12 +6,10 @@ Take into account that this 'project' only focuses on two aspects:
 1) Reading performance for large csv files.
 2) Performance of sorting the data set by the number of comments.
 
-
 # Main results
-1) Py-polars takes about 2.5 seconds to load a 360 MB large csv file as a data frame. Pandas is about 5 times slower while Gretl needs 36 seconds for this.
+1) Py-polars takes about 2.5 seconds to load a 360 MB large csv file as a data frame. Pandas is about 5 times slower while Gretl needs 32 seconds for this.
 2) However, making use of clever indexing, Gretl needs only about 12 seconds to load the csv file.
-3) Sorting 26 million records takes py-polars about 4.6 seconds and hence is just slightly faster than Pandas with 5.8 sec. -- ok, still 20% percent. Latest experimental Gretl version 2020f needs about 7.8 seconds for the same task.
-
+3) Sorting 26 million records takes py-polars about 4.6 seconds and hence is just slightly faster than Pandas with 5.8 sec. -- ok, still 20% percent. Latest experimental Gretl version 2020f needs about 7.8 seconds for the same task. Current stable Gretl version 2020e needs about 15 seconds.
 
 # Technical details
 ## The data set
@@ -52,7 +50,6 @@ The source code can be found in [this github repo](https://github.com/atecon/Gre
 ## Gretl code
 The Gretl source code is stored in ```./Gretl/load_and_sort.inp```. Simply run this script file with Gretl.
 
-
 ## Python code
 The source code for running the Python stuff can be found in ```./python```. The file ```load_and_sort_with_pandas.py``` executes, as its name says, the stuff using the Pandas library. ```load_and_sort_with_pypolars.py``` does the same using the py-polars library, instead.
 
@@ -92,13 +89,13 @@ At the time of writing this, the current developing gretl version is 2020f. If y
 
 
 # Some comments on Gretl and large data sets
-## Do not -- really -- use the gdt/b data format for large data sets
+## Do not -- really -- use the gdt/b data format for very large data sets
 Gretl's default data set is the ```gdt``` data format which is in fact an xml file holding the actual data and some metadata. It is, however, well known that xml is very inefficient when it comes to large data sets. "Libxml2 is having to allocate a ton of memory to parse the entire document.", as Allin Cottrell writes [here](https://Gretlml.univpm.it/hyperkitty/list/Gretl-users@Gretlml.univpm.it/message/V5FATZTNC2ELPUUHWJK4R3MIT7ULWNKD/). Thus, trying to store the data set as gdtb/b file, and opening that file will blow up memory consumption.
 
-Gretl also allows you store this gdt file in a compressed way holding things in the ```gdtb``` file format. Do not try to store the ```users``` data set as gdtb -- the compression takes literally hours.
+Gretl also allows you store this gdt file in a compressed way holding things in the ```gdtb``` file format. Do not try to store the ```users``` data set as gdtb -- the compression takes literally hours. While gdt and gdtb are totally valid data sets for data sets typically used in econometrics comprising about at maximum 1 milltion rows or so, one should rather use csv or some uncomprossed binary data type for larger data sets.
 
 ## New forthcoming feature -- uncompressed binary data set
-As a result of this little comparison, leading Gretl developer Allin Cottrell [started to experiment with a new uncompressed binary data set](https://Gretlml.univpm.it/hyperkitty/list/Gretl-users@Gretlml.univpm.it/message/V5FATZTNC2ELPUUHWJK4R3MIT7ULWNKD/). The ```gbin``` data format stores only minimal metadata (variable names, observation markers if present, basic time-series info) but does *currently* not handle string-valued series.
+As a result of this little comparison, leading Gretl developer Allin Cottrell [started to experiment with a new uncompressed binary data set](https://Gretlml.univpm.it/hyperkitty/list/Gretl-users@Gretlml.univpm.it/message/V5FATZTNC2ELPUUHWJK4R3MIT7ULWNKD/). The ```gbin``` data format stores only minimal metadata (variable names, observation markers if present, basic time-series info) and handles since 2020-12-23 also string-valued series.
 
 The stored gbin data set as slightly larger with 394 MB compared to the csv 359 MB.
 
@@ -106,4 +103,4 @@ Writing the gbin data file takes only 2.41 seconds (!) on my machine which is am
 
 Reading this almost 400 MB large binary data set takes about 5.7 seconds and hence is twice as fast as reading a csv file with an 'obs' column as described before.
 
-This new data format is really great news. Let's hope that it will also support string-based values at some time.
+This new data format ```gbin``` is really great news.
